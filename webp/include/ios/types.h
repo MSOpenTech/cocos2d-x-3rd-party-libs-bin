@@ -1,10 +1,8 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
 //
-// Use of this source code is governed by a BSD-style license
-// that can be found in the COPYING file in the root of the source
-// tree. An additional intellectual property rights grant can be found
-// in the file PATENTS. All contributing project authors may
-// be found in the AUTHORS file in the root of the source tree.
+// This code is licensed under the same terms as WebM:
+//  Software License Agreement:  http://www.webmproject.org/license/software/
+//  Additional IP Rights Grant:  http://www.webmproject.org/license/additional/
 // -----------------------------------------------------------------------------
 //
 //  Common types
@@ -18,11 +16,10 @@
 
 #ifndef _MSC_VER
 #include <inttypes.h>
-#if defined(__cplusplus) || !defined(__STRICT_ANSI__) || \
-    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
-#define WEBP_INLINE inline
-#else
+#ifdef __STRICT_ANSI__
 #define WEBP_INLINE
+#else  /* __STRICT_ANSI__ */
+#define WEBP_INLINE inline
 #endif
 #else
 typedef signed   char int8_t;
@@ -39,11 +36,7 @@ typedef long long int int64_t;
 #ifndef WEBP_EXTERN
 // This explicitly marks library functions and allows for changing the
 // signature for e.g., Windows DLL builds.
-# if defined(__GNUC__) && __GNUC__ >= 4
-#  define WEBP_EXTERN(type) extern __attribute__ ((visibility ("default"))) type
-# else
-#  define WEBP_EXTERN(type) extern type
-# endif  /* __GNUC__ >= 4 */
+#define WEBP_EXTERN(type) extern type
 #endif  /* WEBP_EXTERN */
 
 // Macro to check ABI compatibility (same major revision number)

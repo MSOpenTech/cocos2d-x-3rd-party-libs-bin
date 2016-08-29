@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Scott Lembcke and Howling Moon Software
+/* Copyright (c) 2010 Scott Lembcke
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,48 +69,48 @@ struct cpSpatialIndex {
 typedef struct cpSpaceHash cpSpaceHash;
 
 /// Allocate a spatial hash.
-CP_EXPORT cpSpaceHash* cpSpaceHashAlloc(void);
+cpSpaceHash* cpSpaceHashAlloc(void);
 /// Initialize a spatial hash. 
-CP_EXPORT cpSpatialIndex* cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 /// Allocate and initialize a spatial hash.
-CP_EXPORT cpSpatialIndex* cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 /// Change the cell dimensions and table size of the spatial hash to tune it.
 /// The cell dimensions should roughly match the average size of your objects
 /// and the table size should be ~10 larger than the number of objects inserted.
 /// Some trial and error is required to find the optimum numbers for efficiency.
-CP_EXPORT void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
+void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 
 //MARK: AABB Tree
 
 typedef struct cpBBTree cpBBTree;
 
 /// Allocate a bounding box tree.
-CP_EXPORT cpBBTree* cpBBTreeAlloc(void);
+cpBBTree* cpBBTreeAlloc(void);
 /// Initialize a bounding box tree.
-CP_EXPORT cpSpatialIndex* cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 /// Allocate and initialize a bounding box tree.
-CP_EXPORT cpSpatialIndex* cpBBTreeNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpBBTreeNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 /// Perform a static top down optimization of the tree.
-CP_EXPORT void cpBBTreeOptimize(cpSpatialIndex *index);
+void cpBBTreeOptimize(cpSpatialIndex *index);
 
 /// Bounding box tree velocity callback function.
 /// This function should return an estimate for the object's velocity.
 typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
 /// Set the velocity function for the bounding box tree to enable temporal coherence.
-CP_EXPORT void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
+void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
 
 //MARK: Single Axis Sweep
 
 typedef struct cpSweep1D cpSweep1D;
 
 /// Allocate a 1D sort and sweep broadphase.
-CP_EXPORT cpSweep1D* cpSweep1DAlloc(void);
+cpSweep1D* cpSweep1DAlloc(void);
 /// Initialize a 1D sort and sweep broadphase.
-CP_EXPORT cpSpatialIndex* cpSweep1DInit(cpSweep1D *sweep, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpSweep1DInit(cpSweep1D *sweep, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 /// Allocate and initialize a 1D sort and sweep broadphase.
-CP_EXPORT cpSpatialIndex* cpSweep1DNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex* cpSweep1DNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 //MARK: Spatial Index Implementation
 

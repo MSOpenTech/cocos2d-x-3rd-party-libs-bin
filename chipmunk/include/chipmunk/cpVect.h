@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Scott Lembcke and Howling Moon Software
+/* Copyright (c) 2007 Scott Lembcke
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,11 +19,6 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_VECT_H
-#define CHIPMUNK_VECT_H
-
-#include "chipmunk_types.h"
-
 /// @defgroup cpVect cpVect
 /// Chipmunk's 2D vector type along with a handy 2D vector math lib.
 /// @{
@@ -37,6 +32,17 @@ static inline cpVect cpv(const cpFloat x, const cpFloat y)
 	cpVect v = {x, y};
 	return v;
 }
+
+/// Spherical linearly interpolate between v1 and v2.
+cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t);
+
+/// Spherical linearly interpolate between v1 towards v2 by no more than angle a radians
+cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a);
+
+///	Returns a string representation of v. Intended mostly for debugging purposes and not production use.
+///	@attention The string points to a static local and is reset every time the function is called.
+///	If you want to print more than one vector you will have to split up your printing onto separate lines.
+char* cpvstr(const cpVect v);
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
 static inline cpBool cpveql(const cpVect v1, const cpVect v2)
@@ -149,30 +155,10 @@ static inline cpVect cpvnormalize(const cpVect v)
 	return cpvmult(v, 1.0f/(cpvlength(v) + CPFLOAT_MIN));
 }
 
-/// Spherical linearly interpolate between v1 and v2.
-static inline cpVect
-cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)
+/// @deprecated Just an alias for cpvnormalize() now.
+static inline cpVect cpvnormalize_safe(const cpVect v)
 {
-	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
-	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
-	
-	if(omega < 1e-3){
-		// If the angle between two vectors is very small, lerp instead to avoid precision issues.
-		return cpvlerp(v1, v2, t);
-	} else {
-		cpFloat denom = 1.0f/cpfsin(omega);
-		return cpvadd(cpvmult(v1, cpfsin((1.0f - t)*omega)*denom), cpvmult(v2, cpfsin(t*omega)*denom));
-	}
-}
-
-/// Spherical linearly interpolate between v1 towards v2 by no more than angle a radians
-static inline cpVect
-cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
-{
-	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
-	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
-	
-	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
+	return cpvnormalize(v);
 }
 
 /// Clamp v to length len.
@@ -211,7 +197,6 @@ static inline cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dis
 /// 2x2 matrix type used for tensors and such.
 /// @{
 
-// NUKE
 static inline cpMat2x2
 cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d)
 {
@@ -226,5 +211,3 @@ cpMat2x2Transform(cpMat2x2 m, cpVect v)
 }
 
 ///@}
-
-#endif

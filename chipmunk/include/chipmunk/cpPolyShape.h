@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 Scott Lembcke and Howling Moon Software
+/* Copyright (c) 2007 Scott Lembcke
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,60 @@
 /// @defgroup cpPolyShape cpPolyShape
 /// @{
 
-/// Allocate a polygon shape.
-CP_EXPORT cpPolyShape* cpPolyShapeAlloc(void);
-/// Initialize a polygon shape with rounded corners.
-/// A convex hull will be created from the vertexes.
-CP_EXPORT cpPolyShape* cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius);
-/// Initialize a polygon shape with rounded corners.
-/// The vertexes must be convex with a counter-clockwise winding.
-CP_EXPORT cpPolyShape* cpPolyShapeInitRaw(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpFloat radius);
-/// Allocate and initialize a polygon shape with rounded corners.
-/// A convex hull will be created from the vertexes.
-CP_EXPORT cpShape* cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius);
-/// Allocate and initialize a polygon shape with rounded corners.
-/// The vertexes must be convex with a counter-clockwise winding.
-CP_EXPORT cpShape* cpPolyShapeNewRaw(cpBody *body, int count, const cpVect *verts, cpFloat radius);
+/// @private
+typedef struct cpSplittingPlane {
+	cpVect n;
+	cpFloat d;
+} cpSplittingPlane;
 
-/// Initialize a box shaped polygon shape with rounded corners.
-CP_EXPORT cpPolyShape* cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height, cpFloat radius);
-/// Initialize an offset box shaped polygon shape with rounded corners.
-CP_EXPORT cpPolyShape* cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius);
+/// @private
+typedef struct cpPolyShape {
+	cpShape shape;
+	
+	int numVerts;
+	cpVect *verts, *tVerts;
+	cpSplittingPlane *planes, *tPlanes;
+	
+	cpFloat r;
+} cpPolyShape;
+
+/// Allocate a polygon shape.
+cpPolyShape* cpPolyShapeAlloc(void);
+/// Initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpPolyShape* cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset);
+/// Initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpPolyShape* cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius);
+/// Allocate and initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpShape* cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset);
+/// Allocate and initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpShape* cpPolyShapeNew2(cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius);
+
+/// Initialize a box shaped polygon shape.
+cpPolyShape* cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height);
+/// Initialize an offset box shaped polygon shape.
+cpPolyShape* cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box);
+/// Initialize an offset box shaped polygon shape.
+cpPolyShape* cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius);
 /// Allocate and initialize a box shaped polygon shape.
-CP_EXPORT cpShape* cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height, cpFloat radius);
+cpShape* cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height);
 /// Allocate and initialize an offset box shaped polygon shape.
-CP_EXPORT cpShape* cpBoxShapeNew2(cpBody *body, cpBB box, cpFloat radius);
+cpShape* cpBoxShapeNew2(cpBody *body, cpBB box);
+/// Allocate and initialize an offset box shaped polygon shape.
+cpShape* cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius);
+
+/// Check that a set of vertexes is convex and has a clockwise winding.
+/// NOTE: Due to floating point precision issues, hulls created with cpQuickHull() are not guaranteed to validate!
+cpBool cpPolyValidate(const cpVect *verts, const int numVerts);
 
 /// Get the number of verts in a polygon shape.
-CP_EXPORT int cpPolyShapeGetCount(const cpShape *shape);
+int cpPolyShapeGetNumVerts(const cpShape *shape);
 /// Get the @c ith vertex of a polygon shape.
-CP_EXPORT cpVect cpPolyShapeGetVert(const cpShape *shape, int index);
+cpVect cpPolyShapeGetVert(const cpShape *shape, int idx);
 /// Get the radius of a polygon shape.
-CP_EXPORT cpFloat cpPolyShapeGetRadius(const cpShape *shape);
+cpFloat cpPolyShapeGetRadius(const cpShape *shape);
 
 /// @}

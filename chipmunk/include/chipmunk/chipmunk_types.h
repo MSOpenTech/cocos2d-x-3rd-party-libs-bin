@@ -1,34 +1,31 @@
-/* Copyright (c) 2013 Scott Lembcke and Howling Moon Software
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-#ifndef CHIPMUNK_TYPES_H
-#define CHIPMUNK_TYPES_H
-
 #include <stdint.h>
 #include <float.h>
-#include <math.h>
+
+#ifdef __APPLE__
+   #include "TargetConditionals.h"
+#endif
+
+//#if ((TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1)) && (!defined CP_USE_CGPOINTS)
+//	#define CP_USE_CGPOINTS 1
+//#endif
+
+#if CP_USE_CGPOINTS == 1
+	#if TARGET_OS_IPHONE
+		#import <CoreGraphics/CGGeometry.h>
+	#elif TARGET_OS_MAC
+		#include <ApplicationServices/ApplicationServices.h>
+	#endif
+	
+	#if defined(__LP64__) && __LP64__
+		#define CP_USE_DOUBLES 1
+	#else
+		#define CP_USE_DOUBLES 0
+	#endif
+#endif
 
 #ifndef CP_USE_DOUBLES
-	// Use doubles by default for higher precision.
-	#define CP_USE_DOUBLES 0
+	// use doubles by default for higher precision
+	#define CP_USE_DOUBLES 1
 #endif
 
 /// @defgroup basicTypes Basic Types
@@ -85,8 +82,13 @@
 	#endif
 #endif
 
+#ifndef M_PI
+	#define M_PI 3.14159265358979323846264338327950288
+#endif
 
-#define CP_PI ((cpFloat)3.14159265358979323846264338327950288)
+#ifndef M_E
+	#define M_E 2.71828182845904523536028747135266250
+#endif
 
 
 /// Return the max of two cpFloats.
@@ -134,11 +136,7 @@ static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 }
 
 /// Hash value type.
-#ifdef CP_HASH_VALUE_TYPE
-	typedef CP_HASH_VALUE_TYPE cpHashValue;
-#else
-	typedef uintptr_t cpHashValue;
-#endif
+typedef uintptr_t cpHashValue;
 
 /// Type used internally to cache colliding object info for cpCollideShapes().
 /// Should be at least 32 bits.
@@ -149,7 +147,7 @@ typedef uint32_t cpCollisionID;
 #ifdef CP_BOOL_TYPE
 	typedef CP_BOOL_TYPE cpBool;
 #else
-	typedef unsigned char cpBool;
+	typedef int cpBool;
 #endif
 
 #ifndef cpTrue
@@ -183,11 +181,11 @@ typedef uint32_t cpCollisionID;
 	typedef uintptr_t cpGroup;
 #endif
 
-#ifdef CP_BITMASK_TYPE
-	typedef CP_BITMASK_TYPE cpBitmask;
+#ifdef CP_LAYERS_TYPE
+	typedef CP_LAYERS_TYPE cpLayers;
 #else
-/// Type used for cpShapeFilter category and mask.
-	typedef unsigned int cpBitmask;
+/// Type used for cpShape.layers.
+	typedef unsigned int cpLayers;
 #endif
 
 #ifdef CP_TIMESTAMP_TYPE
@@ -202,21 +200,15 @@ typedef uint32_t cpCollisionID;
 	#define CP_NO_GROUP ((cpGroup)0)
 #endif
 
-#ifndef CP_ALL_CATEGORIES
+#ifndef CP_ALL_LAYERS
 /// Value for cpShape.layers signifying that a shape is in every layer.
-	#define CP_ALL_CATEGORIES (~(cpBitmask)0)
+	#define CP_ALL_LAYERS (~(cpLayers)0)
 #endif
-
-#ifndef CP_WILDCARD_COLLISION_TYPE
-/// cpCollisionType value internally reserved for hashing wildcard handlers.
-	#define CP_WILDCARD_COLLISION_TYPE (~(cpCollisionType)0)
-#endif
-
 /// @}
 
 // CGPoints are structurally the same, and allow
 // easy interoperability with other Cocoa libraries
-#if CP_USE_CGTYPES
+#if CP_USE_CGPOINTS
 	typedef CGPoint cpVect;
 #else
 /// Chipmunk's 2D vector type.
@@ -224,19 +216,7 @@ typedef uint32_t cpCollisionID;
 	typedef struct cpVect{cpFloat x,y;} cpVect;
 #endif
 
-#if CP_USE_CGTYPES
-	typedef CGAffineTransform cpTransform;
-#else
-	/// Column major affine transform.
-	typedef struct cpTransform {
-		cpFloat a, b, c, d, tx, ty;
-	} cpTransform;
-#endif
-
-// NUKE
 typedef struct cpMat2x2 {
 	// Row major [[a, b][c d]]
 	cpFloat a, b, c, d;
 } cpMat2x2;
-
-#endif
